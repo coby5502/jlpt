@@ -102,7 +102,8 @@ export async function renderQuestion(
 function renderPassage(exam: Exam, pid: string, idx: ReturnType<typeof buildIndex>): string {
   const p = exam.passages[pid];
   if (!p) return '';
-  return `<aside class="passage"><div class="ja">${renderJa(p.ja, idx)}</div></aside>`;
+  const ko = p.ko ? `<details class="passage-ko"><summary>한국어 번역</summary><div class="ko">${escapeHtml(p.ko)}</div></details>` : '';
+  return `<aside class="passage"><div class="ja">${renderJa(p.ja, idx)}</div>${ko}</aside>`;
 }
 
 function renderJa(text: string, idx: ReturnType<typeof buildIndex>): string {
