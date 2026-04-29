@@ -8,3 +8,4 @@ dist/
 cache/
 *.log
 public/data/
+scripts/.translate-cache.json
