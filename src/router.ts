@@ -11,11 +11,19 @@ export function parseRoute(hash: string): Route {
   const parts = path.split('/');
   if (parts[0] === 'exam' && parts[1]) {
     if (parts[2] === 'q' && parts[3]) {
-      const route: Route = { name: 'question', examId: parts[1], n: Number(parts[3]) };
-      const from = params.get('from'); const to = params.get('to');
-      if (from) (route as any).from = Number(from);
-      if (to) (route as any).to = Number(to);
-      return route;
+      const n = Number(parts[3]);
+      if (!Number.isFinite(n)) return { name: 'home' };
+      const fromRaw = params.get('from');
+      const toRaw = params.get('to');
+      const from = fromRaw !== null ? Number(fromRaw) : undefined;
+      const to = toRaw !== null ? Number(toRaw) : undefined;
+      return {
+        name: 'question',
+        examId: parts[1],
+        n,
+        ...(from !== undefined && Number.isFinite(from) ? { from } : {}),
+        ...(to !== undefined && Number.isFinite(to) ? { to } : {}),
+      };
     }
     return { name: 'exam', examId: parts[1] };
   }

@@ -17,4 +17,10 @@ describe('parseRoute', () => {
   it('question without range', () => {
     expect(parseRoute('#/exam/x/q/10')).toEqual({ name: 'question', examId: 'x', n: 10 });
   });
+  it('falls back to home for non-numeric question n', () => {
+    expect(parseRoute('#/exam/x/q/abc')).toEqual({ name: 'home' });
+  });
+  it('falls back to home for unrecognized path', () => {
+    expect(parseRoute('#/garbage')).toEqual({ name: 'home' });
+  });
 });
