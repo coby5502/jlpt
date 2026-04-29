@@ -52,3 +52,5 @@ html, body { margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
 .vp-w { font-size: 18px; font-weight: 600; }
 .vp-r { color: #666; margin: 2px 0 6px; }
 .vp-m { line-height: 1.5; }
+.toggle { padding: 4px 10px; font-size: 12px; cursor: pointer; border: 1px solid #ddd; background: white; border-radius: 4px; }
+ruby rt { font-size: 0.55em; color: #888; }

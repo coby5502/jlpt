@@ -1,8 +1,9 @@
 import { loadExam, loadVocab } from '../lib/data';
 import { categoryKo } from '../lib/categories';
 import { navigate } from '../router';
-import { recordAnswer, setLast } from '../state';
+import { recordAnswer, setLast, getSettings, setSettings } from '../state';
 import { buildIndex, matchVocab } from '../lib/vocab-match';
+import { withFurigana, withoutFurigana } from '../lib/furigana';
 import { showPopover, hidePopover } from '../lib/popover';
 import type { Exam, Question } from '../types';
 
@@ -28,6 +29,7 @@ export async function renderQuestion(
     <header class="qhdr">
       <a href="#/exam/${examId}" class="back">← ${escape(exam.title)}</a>
       <div class="qmeta">문제 ${n} / ${max} (범위 ${min}–${max}) · ${categoryKo(q.category)}</div>
+      <button id="toggle-furigana" class="toggle">${getSettings().furigana ? '후리가나 ON' : '후리가나 OFF'}</button>
     </header>
     <main class="qmain">
       ${q.passage ? renderPassage(exam, q.passage, idx) : ''}
@@ -47,6 +49,10 @@ export async function renderQuestion(
   });
   root.querySelector<HTMLButtonElement>('#next')!.addEventListener('click', () => {
     if (n < max) navigate({ name: 'question', examId, n: n + 1, from, to });
+  });
+  root.querySelector<HTMLButtonElement>('#toggle-furigana')!.addEventListener('click', () => {
+    setSettings({ furigana: !getSettings().furigana });
+    renderQuestion(root, examId, n, from, to);
   });
 
   const optBtns = root.querySelectorAll<HTMLButtonElement>('.opt');
@@ -94,11 +100,8 @@ function renderPassage(exam: Exam, pid: string, idx: ReturnType<typeof buildInde
 }
 
 function renderJa(text: string, idx: ReturnType<typeof buildIndex>): string {
-  return matchVocab(text, idx).map((s) =>
-    s.entry
-      ? `<span class="vw" data-w="${escape(s.entry.w)}">${escape(s.text)}</span>`
-      : escape(s.text),
-  ).join('');
+  const segs = matchVocab(text, idx);
+  return getSettings().furigana ? withFurigana(segs) : withoutFurigana(segs);
 }
 
 function gradeAndShow(

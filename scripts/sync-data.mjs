@@ -4,7 +4,11 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(__dirname, '..');
-const src = process.env.DATA_SRC || resolve(repo, 'data/n1_corpus');
+let src = process.env.DATA_SRC || resolve(repo, 'data/n1_corpus_ko');
+if (!existsSync(src)) {
+  console.warn(`[sync-data] ${src} missing — falling back to data/n1_corpus`);
+  src = resolve(repo, 'data/n1_corpus');
+}
 const dst = resolve(repo, 'public/data');
 
 if (!existsSync(src)) {
