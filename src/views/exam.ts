@@ -40,9 +40,12 @@ export async function renderExam(root: HTMLElement, examId: string) {
   });
 
   root.querySelector<HTMLButtonElement>('#go')!.addEventListener('click', () => {
-    const from = Number((root.querySelector('#from') as HTMLInputElement).value);
-    const to = Number((root.querySelector('#to') as HTMLInputElement).value);
-    if (from > to || from < 1) return;
+    const fromEl = root.querySelector<HTMLInputElement>('#from')!;
+    const toEl = root.querySelector<HTMLInputElement>('#to')!;
+    const max = exam.questions.length;
+    const from = Number(fromEl.value);
+    const to = Number(toEl.value);
+    if (!Number.isFinite(from) || !Number.isFinite(to) || from < 1 || to > max || from > to) return;
     navigate({ name: 'question', examId, n: from, from, to });
   });
 }
