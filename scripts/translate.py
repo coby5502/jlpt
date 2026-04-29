@@ -36,7 +36,7 @@ def call(client: Anthropic, system: str, prompt: str, cache: dict) -> str:
         return cache[k]
     msg = client.messages.create(
         model=MODEL,
-        max_tokens=2000,
+        max_tokens=4000,
         system=system,
         messages=[{'role': 'user', 'content': prompt}],
     )
@@ -46,7 +46,7 @@ def call(client: Anthropic, system: str, prompt: str, cache: dict) -> str:
 
 def translate_vocab(client: Anthropic, cache: dict, limit: int | None):
     src = json.loads((SRC / 'vocab.json').read_text(encoding='utf-8'))
-    if limit: src = src[:limit]
+    if limit is not None: src = src[:limit]
     sys_prompt = (
         '당신은 일본어→한국어 사전 번역가입니다. '
         '주어진 일본어 단어와 영어 의미를 보고 자연스러운 한국어 의미로 번역하세요. '
@@ -100,7 +100,7 @@ def translate_exam(client: Anthropic, cache: dict, exam_path: Path):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--limit', type=int, default=None, help='vocab/문제 N개만 (테스트용)')
+    ap.add_argument('--limit', type=int, default=None, help='제한 개수 (vocab은 entry 단위, exams는 회차 파일 단위, 테스트용)')
     ap.add_argument('--what', choices=['vocab', 'exams', 'all'], default='all')
     args = ap.parse_args()
 
@@ -120,7 +120,9 @@ def main():
             translate_vocab(client, cache, args.limit)
         if args.what in ('exams', 'all'):
             print('translating exams...')
-            for f in sorted((SRC / 'exams').glob('n1_*.json')):
+            files = sorted((SRC / 'exams').glob('n1_*.json'))
+            if args.limit is not None: files = files[:args.limit]
+            for f in files:
                 translate_exam(client, cache, f)
                 save_cache(cache)
     finally:
