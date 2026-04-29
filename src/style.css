@@ -37,3 +37,11 @@ html, body { margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
 .qnav button { padding: 8px 16px; cursor: pointer; }
 .qnav button:disabled { opacity: 0.4; cursor: not-allowed; }
 .error { padding: 24px; color: #c00; }
+.opt-correct { border-color: #2c2; background: #e8f7e8; }
+.opt-wrong { border-color: #d44; background: #fbe6e6; }
+.opt-picked { box-shadow: inset 4px 0 0 #d44; }
+.feedback { margin-top: 16px; }
+.verdict { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.verdict.ok { color: #1a7e1a; }
+.verdict.no { color: #c00; }
+.expl { background: #fafafa; border-left: 3px solid #06f; padding: 12px 14px; line-height: 1.6; white-space: pre-wrap; }

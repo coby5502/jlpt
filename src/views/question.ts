@@ -1,8 +1,8 @@
 import { loadExam } from '../lib/data';
 import { categoryKo } from '../lib/categories';
 import { navigate } from '../router';
-import { setLast } from '../state';
-import type { Exam } from '../types';
+import { recordAnswer, setLast } from '../state';
+import type { Exam, Question } from '../types';
 
 export async function renderQuestion(
   root: HTMLElement,
@@ -44,12 +44,67 @@ export async function renderQuestion(
   root.querySelector<HTMLButtonElement>('#next')!.addEventListener('click', () => {
     if (n < max) navigate({ name: 'question', examId, n: n + 1, from, to });
   });
+
+  const optBtns = root.querySelectorAll<HTMLButtonElement>('.opt');
+  const fb = root.querySelector<HTMLDivElement>('#feedback')!;
+
+  optBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const picked = Number(btn.dataset.i);
+      gradeAndShow(q, picked, optBtns, fb, examId);
+    });
+  });
+
+  const keyHandler = (e: KeyboardEvent) => {
+    if (e.target instanceof HTMLInputElement) return;
+    if (e.key >= '1' && e.key <= '4') {
+      const i = Number(e.key) - 1;
+      if (i < q.opts.length) optBtns[i]?.click();
+    } else if (e.key === 'ArrowLeft' && n > min) {
+      navigate({ name: 'question', examId, n: n - 1, from, to });
+    } else if (e.key === 'ArrowRight' && n < max) {
+      navigate({ name: 'question', examId, n: n + 1, from, to });
+    }
+  };
+  document.addEventListener('keydown', keyHandler);
+  const cleanup = () => document.removeEventListener('keydown', keyHandler);
+  window.addEventListener('hashchange', cleanup, { once: true });
 }
 
 function renderPassage(exam: Exam, pid: string): string {
   const p = exam.passages[pid];
   if (!p) return '';
   return `<aside class="passage"><pre class="ja">${escape(p.ja)}</pre></aside>`;
+}
+
+function gradeAndShow(
+  q: Question,
+  picked: number,
+  optBtns: NodeListOf<HTMLButtonElement>,
+  fb: HTMLDivElement,
+  examId: string,
+) {
+  const correct = picked === q.correct;
+  recordAnswer(examId, q.n, picked, correct);
+
+  optBtns.forEach((b, i) => {
+    b.classList.remove('opt-picked', 'opt-correct', 'opt-wrong');
+    if (i === picked) b.classList.add(correct ? 'opt-correct' : 'opt-wrong');
+    if (i === q.correct) b.classList.add('opt-correct');
+    if (i === picked && !correct) b.classList.add('opt-picked');
+  });
+
+  const verdict = correct ? '✓ 정답' : `✗ 오답 (정답: ${q.correct + 1}번)`;
+  const expl = q.expl_ko ?? q.expl ?? '(해설 없음)';
+  fb.innerHTML = `
+    <div class="verdict ${correct ? 'ok' : 'no'}">${verdict}</div>
+    <div class="expl">${escapeHtml(expl)}</div>
+  `;
+  fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }
 
 function escape(s: string): string {
