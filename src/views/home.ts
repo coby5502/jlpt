@@ -6,6 +6,8 @@ export async function renderHome(root: HTMLElement) {
   root.innerHTML = '<div class="loading">불러오는 중…</div>';
   const idx = await loadIndex();
   const last = getLast();
+  const totalQuestions = idx.exams.reduce((sum, e) => sum + e.questions, 0);
+  const answeredTotal = idx.exams.reduce((sum, e) => sum + Object.keys(getProgress(e.id)).length, 0);
 
   const cards = idx.exams.map((e) => {
     const prog = getProgress(e.id);
@@ -31,7 +33,7 @@ export async function renderHome(root: HTMLElement) {
   }).join('');
 
   const resume = last
-    ? `<a class="resume" href="#/exam/${last.examId}/q/${last.questionN}">마지막 위치로 이어서 풀기 <span>${last.examId} · 문제 ${last.questionN}</span></a>`
+    ? `<a class="resume" href="#/exam/${last.examId}/q/${last.questionN}"><strong>이어서 풀기</strong><span>${last.examId} · 문제 ${last.questionN}</span></a>`
     : '';
 
   root.innerHTML = `
@@ -44,6 +46,20 @@ export async function renderHome(root: HTMLElement) {
         </div>
         ${resume}
       </header>
+      <section class="dashboard-stats" aria-label="학습 요약">
+        <div class="stat-card">
+          <span>회차</span>
+          <strong>${idx.exams.length}개</strong>
+        </div>
+        <div class="stat-card">
+          <span>문제</span>
+          <strong>총 ${totalQuestions}문제</strong>
+        </div>
+        <div class="stat-card">
+          <span>진도</span>
+          <strong>${answeredTotal}/${totalQuestions}</strong>
+        </div>
+      </section>
       <main class="cards">${cards}</main>
     </div>`;
 }

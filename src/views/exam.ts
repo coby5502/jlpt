@@ -13,8 +13,10 @@ export async function renderExam(root: HTMLElement, examId: string) {
     <li class="sec" data-from="${s.from}" data-to="${s.to}">
       <span class="sec-number">問題${i + 1}</span>
       <span class="sec-label">${sectionLabelKo(i + 1, s.category).replace(/^問題\d+\s*/, '')}</span>
-      <span class="sec-range">${s.from}–${s.to}</span>
-      <span class="sec-count">${s.to - s.from + 1}문제</span>
+      <span class="sec-meta">
+        <span>${s.from}–${s.to}</span>
+        <span>${s.to - s.from + 1}문제</span>
+      </span>
     </li>`).join('');
 
   root.innerHTML = `
@@ -31,7 +33,7 @@ export async function renderExam(root: HTMLElement, examId: string) {
             <p class="eyebrow">Section</p>
             <h2>섹션 선택</h2>
           </div>
-          <ul class="sections">${sectionHtml}</ul>
+          <ul class="sections section-grid">${sectionHtml}</ul>
         </section>
         <section class="range-panel">
           <div class="section-heading">

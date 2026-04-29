@@ -37,6 +37,8 @@ describe('renderHome', () => {
 
     expect(root.querySelector('.app-shell')).not.toBeNull();
     expect(root.querySelector('.hero-kicker')?.textContent).toContain('JLPT N1');
+    expect(root.querySelectorAll('.stat-card')).toHaveLength(3);
+    expect(root.textContent).toContain('총 10문제');
     expect(root.querySelector('.progress-track')?.getAttribute('aria-valuenow')).toBe('20');
     expect(root.textContent).toContain('정답률 50%');
   });

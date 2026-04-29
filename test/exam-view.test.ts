@@ -33,6 +33,8 @@ describe('renderExam', () => {
     await renderExam(root, 'exam-a');
 
     expect(root.textContent).toContain('2문제 · 1지문');
+    expect(root.querySelector('.section-grid')).not.toBeNull();
+    expect(root.querySelector('.sec-meta')?.textContent).toContain('1–2');
     expect(root.textContent).not.toContain('[object Object]');
   });
 });

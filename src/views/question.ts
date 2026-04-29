@@ -29,6 +29,9 @@ export async function renderQuestion(
 
   const min = from ?? 1;
   const max = to ?? exam.questions.length;
+  const rangeTotal = Math.max(1, max - min + 1);
+  const rangePosition = Math.min(Math.max(n - min + 1, 1), rangeTotal);
+  const rangeProgress = Math.round((rangePosition / rangeTotal) * 100);
   const vocab = await loadVocab();
   const idx = buildIndex(vocab);
   setLast(examId, n);
@@ -43,6 +46,10 @@ export async function renderQuestion(
             <span>범위 ${min}–${max}</span>
             <span>${categoryKo(q.category)}</span>
           </div>
+          <div class="question-progress" role="progressbar" aria-label="현재 범위 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${rangeProgress}">
+            <span style="width: ${rangeProgress}%"></span>
+          </div>
+          <div class="qposition">${rangePosition}번째 / ${rangeTotal}문제</div>
         </div>
         <button id="toggle-furigana" class="toggle">${getSettings().furigana ? '후리가나 ON' : '후리가나 OFF'}</button>
       </header>
