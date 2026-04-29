@@ -1,0 +1,28 @@
+{
+  "name": "jlpt",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coby5502/jlpt.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/coby5502/jlpt/issues"
+  },
+  "homepage": "https://github.com/coby5502/jlpt#readme",
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "jsdom": "^29.1.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.10",
+    "vitest": "^4.1.5"
+  }
+}
