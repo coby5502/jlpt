@@ -1,0 +1,9 @@
+.DS_Store
+.venv/
+.claude/
+node_modules/
+dist/
+.env
+.env.local
+cache/
+*.log
