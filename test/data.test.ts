@@ -1,9 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { loadIndex, loadExam, loadVocab, _resetCache } from '../src/lib/data';
 
-// Reference loadVocab to satisfy noUnusedLocals; re-export shape is asserted via type check.
-void loadVocab;
-
 beforeEach(() => {
   _resetCache();
   globalThis.fetch = vi.fn() as any;
@@ -19,6 +16,7 @@ describe('data loader', () => {
     const b = await loadIndex();
     expect(a).toBe(b);
     expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+    expect(globalThis.fetch).toHaveBeenCalledWith('/data/index.json');
   });
 
   it('loadExam fetches the file path from index entry', async () => {
@@ -39,5 +37,16 @@ describe('data loader', () => {
       json: async () => ({ exams: [] }),
     });
     await expect(loadExam('nope')).rejects.toThrow(/unknown exam/);
+  });
+
+  it('caches vocab.json after first fetch', async () => {
+    (globalThis.fetch as any).mockResolvedValue({
+      ok: true,
+      json: async () => [{ w: '余暇', r: 'よか', m: 'leisure' }],
+    });
+    const a = await loadVocab();
+    const b = await loadVocab();
+    expect(a).toBe(b);
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
   });
 });
