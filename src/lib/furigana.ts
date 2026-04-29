@@ -1,4 +1,5 @@
 import type { Segment } from './vocab-match';
+import { escapeHtml } from './html';
 
 export function withFurigana(segments: Segment[]): string {
   return segments.map((s) => {
@@ -17,8 +18,4 @@ export function withoutFurigana(segments: Segment[]): string {
       ? `<span class="vw" data-w="${escapeHtml(s.entry.w)}">${escapeHtml(s.text)}</span>`
       : escapeHtml(s.text),
   ).join('');
-}
-
-function escapeHtml(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }

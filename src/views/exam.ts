@@ -1,5 +1,6 @@
 import { loadExam } from '../lib/data';
 import { sectionLabelKo } from '../lib/categories';
+import { escapeHtml } from '../lib/html';
 import { navigate } from '../router';
 import type { Question } from '../types';
 
@@ -18,7 +19,7 @@ export async function renderExam(root: HTMLElement, examId: string) {
   root.innerHTML = `
     <header class="hero">
       <a href="#/" class="back">← 회차 목록</a>
-      <h1>${escape(exam.title)}</h1>
+      <h1>${escapeHtml(exam.title)}</h1>
     </header>
     <main class="exam-main">
       <h2>섹션 선택</h2>
@@ -60,8 +61,4 @@ function groupBySection(qs: Question[]): Section[] {
     else out.push({ category: q.category, from: q.n, to: q.n });
   }
   return out;
-}
-
-function escape(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }

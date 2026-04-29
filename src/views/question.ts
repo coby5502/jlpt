@@ -1,11 +1,14 @@
 import { loadExam, loadVocab } from '../lib/data';
 import { categoryKo } from '../lib/categories';
+import { escapeHtml } from '../lib/html';
 import { navigate } from '../router';
 import { recordAnswer, setLast, getSettings, setSettings } from '../state';
 import { buildIndex, matchVocab } from '../lib/vocab-match';
 import { withFurigana, withoutFurigana } from '../lib/furigana';
 import { showPopover, hidePopover } from '../lib/popover';
 import type { Exam, Question } from '../types';
+
+let currentController: AbortController | null = null;
 
 export async function renderQuestion(
   root: HTMLElement,
@@ -14,6 +17,11 @@ export async function renderQuestion(
   from?: number,
   to?: number,
 ) {
+  if (currentController) currentController.abort();
+  const controller = new AbortController();
+  currentController = controller;
+  const { signal } = controller;
+
   root.innerHTML = '<div class="loading">불러오는 중…</div>';
   const exam = await loadExam(examId);
   const q = exam.questions.find((x) => x.n === n);
@@ -27,7 +35,7 @@ export async function renderQuestion(
 
   root.innerHTML = `
     <header class="qhdr">
-      <a href="#/exam/${examId}" class="back">← ${escape(exam.title)}</a>
+      <a href="#/exam/${examId}" class="back">← ${escapeHtml(exam.title)}</a>
       <div class="qmeta">문제 ${n} / ${max} (범위 ${min}–${max}) · ${categoryKo(q.category)}</div>
       <button id="toggle-furigana" class="toggle">${getSettings().furigana ? '후리가나 ON' : '후리가나 OFF'}</button>
     </header>
@@ -46,14 +54,14 @@ export async function renderQuestion(
 
   root.querySelector<HTMLButtonElement>('#prev')!.addEventListener('click', () => {
     if (n > min) navigate({ name: 'question', examId, n: n - 1, from, to });
-  });
+  }, { signal });
   root.querySelector<HTMLButtonElement>('#next')!.addEventListener('click', () => {
     if (n < max) navigate({ name: 'question', examId, n: n + 1, from, to });
-  });
+  }, { signal });
   root.querySelector<HTMLButtonElement>('#toggle-furigana')!.addEventListener('click', () => {
     setSettings({ furigana: !getSettings().furigana });
     renderQuestion(root, examId, n, from, to);
-  });
+  }, { signal });
 
   const optBtns = root.querySelectorAll<HTMLButtonElement>('.opt');
   const fb = root.querySelector<HTMLDivElement>('#feedback')!;
@@ -62,7 +70,7 @@ export async function renderQuestion(
     btn.addEventListener('click', () => {
       const picked = Number(btn.dataset.i);
       gradeAndShow(q, picked, optBtns, fb, examId);
-    });
+    }, { signal });
   });
 
   const keyHandler = (e: KeyboardEvent) => {
@@ -76,9 +84,7 @@ export async function renderQuestion(
       navigate({ name: 'question', examId, n: n + 1, from, to });
     }
   };
-  document.addEventListener('keydown', keyHandler);
-  const cleanup = () => document.removeEventListener('keydown', keyHandler);
-  window.addEventListener('hashchange', cleanup, { once: true });
+  document.addEventListener('keydown', keyHandler, { signal });
 
   const vocabMap = new Map(vocab.map((v) => [v.w, v]));
   root.addEventListener('click', (e) => {
@@ -89,8 +95,8 @@ export async function renderQuestion(
       const v = vocabMap.get(w);
       if (v) showPopover(t, v);
     }
-  });
-  window.addEventListener('hashchange', hidePopover, { once: true });
+  }, { signal });
+  window.addEventListener('hashchange', hidePopover, { signal });
 }
 
 function renderPassage(exam: Exam, pid: string, idx: ReturnType<typeof buildIndex>): string {
@@ -124,11 +130,7 @@ function gradeAndShow(
   const expl = q.expl_ko ?? q.expl ?? '(해설 없음)';
   fb.innerHTML = `
     <div class="verdict ${correct ? 'ok' : 'no'}">${verdict}</div>
-    <div class="expl">${escape(expl)}</div>
+    <div class="expl">${escapeHtml(expl)}</div>
   `;
   fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-function escape(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }

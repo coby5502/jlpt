@@ -1,4 +1,5 @@
 import { loadIndex } from '../lib/data';
+import { escapeHtml } from '../lib/html';
 import { getProgress, getLast } from '../state';
 
 export async function renderHome(root: HTMLElement) {
@@ -12,7 +13,7 @@ export async function renderHome(root: HTMLElement) {
     const correct = Object.values(prog).filter((p) => p.correct).length;
     return `
       <a class="card" href="#/exam/${e.id}">
-        <div class="card-title">${escape(e.title)}</div>
+        <div class="card-title">${escapeHtml(e.title)}</div>
         <div class="card-meta">${e.questions}문제 · ${e.passages}지문</div>
         <div class="card-prog">${answered}/${e.questions} 답함${answered ? ` · 정답 ${correct}` : ''}</div>
       </a>`;
@@ -28,8 +29,4 @@ export async function renderHome(root: HTMLElement) {
       ${resume}
     </header>
     <div class="cards">${cards}</div>`;
-}
-
-function escape(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }

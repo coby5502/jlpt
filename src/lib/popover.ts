@@ -1,4 +1,5 @@
 import type { VocabEntry } from '../types';
+import { escapeHtml } from './html';
 
 let current: HTMLDivElement | null = null;
 
@@ -7,9 +8,9 @@ export function showPopover(near: HTMLElement, entry: VocabEntry) {
   const pop = document.createElement('div');
   pop.className = 'vocab-popover';
   pop.innerHTML = `
-    <div class="vp-w">${escape(entry.w)}</div>
-    <div class="vp-r">${escape(entry.r)}</div>
-    <div class="vp-m">${escape(entry.m_ko ?? entry.m)}</div>
+    <div class="vp-w">${escapeHtml(entry.w)}</div>
+    <div class="vp-r">${escapeHtml(entry.r)}</div>
+    <div class="vp-m">${escapeHtml(entry.m_ko ?? entry.m)}</div>
   `;
   document.body.appendChild(pop);
   const r = near.getBoundingClientRect();
@@ -29,8 +30,4 @@ export function hidePopover() {
   (current as any)._off?.();
   current.remove();
   current = null;
-}
-
-function escape(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }
