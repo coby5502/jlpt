@@ -20,7 +20,11 @@ function read<T>(key: string, fallback: T): T {
   }
 }
 function write(key: string, val: unknown) {
-  localStorage.setItem(key, JSON.stringify(val));
+  try {
+    localStorage.setItem(key, JSON.stringify(val));
+  } catch (e) {
+    console.warn('[state] localStorage write failed:', e);
+  }
 }
 
 export function recordAnswer(examId: string, n: number, picked: number, correct: boolean) {
