@@ -1,2 +1,9 @@
-const app = document.getElementById('app');
-if (app) app.textContent = 'JLPT N1 학습 — 부팅 OK';
+import { onRouteChange } from './router';
+import { renderHome } from './views/home';
+
+const root = document.getElementById('app')!;
+
+onRouteChange(async (route) => {
+  if (route.name === 'home') await renderHome(root);
+  else root.innerHTML = `<pre>route: ${JSON.stringify(route)}</pre>`;
+});
