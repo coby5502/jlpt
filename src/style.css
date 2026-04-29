@@ -45,3 +45,10 @@ html, body { margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
 .verdict.ok { color: #1a7e1a; }
 .verdict.no { color: #c00; }
 .expl { background: #fafafa; border-left: 3px solid #06f; padding: 12px 14px; line-height: 1.6; white-space: pre-wrap; }
+
+.vw { border-bottom: 1px dashed #06f; cursor: help; }
+.vw:hover { background: #eef5ff; }
+.vocab-popover { position: absolute; z-index: 1000; background: white; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,.12); padding: 10px 12px; max-width: 280px; font-size: 14px; }
+.vp-w { font-size: 18px; font-weight: 600; }
+.vp-r { color: #666; margin: 2px 0 6px; }
+.vp-m { line-height: 1.5; }
