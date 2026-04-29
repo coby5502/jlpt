@@ -9,3 +9,4 @@ cache/
 *.log
 public/data/
 scripts/.translate-cache.json
+__pycache__/
