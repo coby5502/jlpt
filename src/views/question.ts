@@ -89,22 +89,17 @@ function gradeAndShow(
 
   optBtns.forEach((b, i) => {
     b.classList.remove('opt-picked', 'opt-correct', 'opt-wrong');
-    if (i === picked) b.classList.add(correct ? 'opt-correct' : 'opt-wrong');
     if (i === q.correct) b.classList.add('opt-correct');
-    if (i === picked && !correct) b.classList.add('opt-picked');
+    else if (i === picked) b.classList.add('opt-wrong', 'opt-picked');
   });
 
   const verdict = correct ? '✓ 정답' : `✗ 오답 (정답: ${q.correct + 1}번)`;
   const expl = q.expl_ko ?? q.expl ?? '(해설 없음)';
   fb.innerHTML = `
     <div class="verdict ${correct ? 'ok' : 'no'}">${verdict}</div>
-    <div class="expl">${escapeHtml(expl)}</div>
+    <div class="expl">${escape(expl)}</div>
   `;
   fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-function escapeHtml(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }
 
 function escape(s: string): string {
