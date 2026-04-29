@@ -11,26 +11,41 @@ export async function renderExam(root: HTMLElement, examId: string) {
 
   const sectionHtml = sections.map((s, i) => `
     <li class="sec" data-from="${s.from}" data-to="${s.to}">
-      <span class="sec-label">${sectionLabelKo(i + 1, s.category)}</span>
-      <span class="sec-range">[${s.from}–${s.to}]</span>
+      <span class="sec-number">問題${i + 1}</span>
+      <span class="sec-label">${sectionLabelKo(i + 1, s.category).replace(/^問題\d+\s*/, '')}</span>
+      <span class="sec-range">${s.from}–${s.to}</span>
       <span class="sec-count">${s.to - s.from + 1}문제</span>
     </li>`).join('');
 
   root.innerHTML = `
-    <header class="hero">
-      <a href="#/" class="back">← 회차 목록</a>
-      <h1>${escapeHtml(exam.title)}</h1>
-    </header>
-    <main class="exam-main">
-      <h2>섹션 선택</h2>
-      <ul class="sections">${sectionHtml}</ul>
-      <h2>또는 직접 범위</h2>
-      <div class="range-pick">
-        <label>From <input type="number" id="from" min="1" max="${exam.questions.length}" value="1" /></label>
-        <label>To <input type="number" id="to" min="1" max="${exam.questions.length}" value="${exam.questions.length}" /></label>
-        <button id="go">시작</button>
-      </div>
-    </main>`;
+    <div class="app-shell">
+      <header class="hero exam-hero">
+        <a href="#/" class="back">회차 목록으로</a>
+        <p class="hero-kicker">Exam Overview</p>
+        <h1>${escapeHtml(exam.title)}</h1>
+        <p class="hero-copy">${exam.questions.length}문제 · ${Object.keys(exam.passages).length}지문 · 원하는 섹션만 골라 풀 수 있어요.</p>
+      </header>
+      <main class="exam-main panel">
+        <section>
+          <div class="section-heading">
+            <p class="eyebrow">Section</p>
+            <h2>섹션 선택</h2>
+          </div>
+          <ul class="sections">${sectionHtml}</ul>
+        </section>
+        <section class="range-panel">
+          <div class="section-heading">
+            <p class="eyebrow">Custom Range</p>
+            <h2>직접 범위 지정</h2>
+          </div>
+          <div class="range-pick">
+            <label>From <input type="number" id="from" min="1" max="${exam.questions.length}" value="1" /></label>
+            <label>To <input type="number" id="to" min="1" max="${exam.questions.length}" value="${exam.questions.length}" /></label>
+            <button id="go">시작하기</button>
+          </div>
+        </section>
+      </main>
+    </div>`;
 
   root.querySelectorAll<HTMLLIElement>('.sec').forEach((li) => {
     li.addEventListener('click', () => {

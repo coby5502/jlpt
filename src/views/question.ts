@@ -34,23 +34,33 @@ export async function renderQuestion(
   setLast(examId, n);
 
   root.innerHTML = `
-    <header class="qhdr">
-      <a href="#/exam/${examId}" class="back">← ${escapeHtml(exam.title)}</a>
-      <div class="qmeta">문제 ${n} / ${max} (범위 ${min}–${max}) · ${categoryKo(q.category)}</div>
-      <button id="toggle-furigana" class="toggle">${getSettings().furigana ? '후리가나 ON' : '후리가나 OFF'}</button>
-    </header>
-    <main class="qmain">
-      ${q.passage ? renderPassage(exam, q.passage, idx) : ''}
-      <div class="stem">${q.stem ? renderJa(q.stem, idx) : '(빈칸 채우기 — 위 지문 참조)'}</div>
-      <ol class="opts">
-        ${q.opts.map((o, i) => `<li><button class="opt" data-i="${i}">${i + 1}. ${renderJa(o, idx)}</button></li>`).join('')}
-      </ol>
-      <div class="feedback" id="feedback"></div>
-      <nav class="qnav">
-        <button id="prev" ${n <= min ? 'disabled' : ''}>← 이전</button>
-        <button id="next" ${n >= max ? 'disabled' : ''}>다음 →</button>
-      </nav>
-    </main>`;
+    <div class="study-shell">
+      <header class="qhdr">
+        <div>
+          <a href="#/exam/${examId}" class="back">${escapeHtml(exam.title)}</a>
+          <div class="qmeta">
+            <span>문제 ${n} / ${max}</span>
+            <span>범위 ${min}–${max}</span>
+            <span>${categoryKo(q.category)}</span>
+          </div>
+        </div>
+        <button id="toggle-furigana" class="toggle">${getSettings().furigana ? '후리가나 ON' : '후리가나 OFF'}</button>
+      </header>
+      <main class="qmain">
+        <section class="question-card">
+          ${q.passage ? renderPassage(exam, q.passage, idx) : ''}
+          <div class="stem">${q.stem ? renderJa(q.stem, idx) : '(빈칸 채우기 — 위 지문 참조)'}</div>
+          <ol class="opts">
+            ${q.opts.map((o, i) => `<li><button class="opt" data-i="${i}"><span>${i + 1}</span>${renderJa(o, idx)}</button></li>`).join('')}
+          </ol>
+          <div class="feedback" id="feedback"></div>
+          <nav class="qnav">
+            <button id="prev" ${n <= min ? 'disabled' : ''}>이전</button>
+            <button id="next" ${n >= max ? 'disabled' : ''}>다음</button>
+          </nav>
+        </section>
+      </main>
+    </div>`;
 
   root.querySelector<HTMLButtonElement>('#prev')!.addEventListener('click', () => {
     if (n > min) navigate({ name: 'question', examId, n: n - 1, from, to });

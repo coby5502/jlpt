@@ -11,22 +11,39 @@ export async function renderHome(root: HTMLElement) {
     const prog = getProgress(e.id);
     const answered = Object.keys(prog).length;
     const correct = Object.values(prog).filter((p) => p.correct).length;
+    const progress = e.questions ? Math.round((answered / e.questions) * 100) : 0;
+    const accuracy = answered ? Math.round((correct / answered) * 100) : 0;
     return `
-      <a class="card" href="#/exam/${e.id}">
+      <a class="card exam-card" href="#/exam/${e.id}">
+        <div class="card-topline">
+          <span class="card-badge">Mock Test</span>
+          <span class="card-meta">${e.questions}문제 · ${e.passages}지문</span>
+        </div>
         <div class="card-title">${escapeHtml(e.title)}</div>
-        <div class="card-meta">${e.questions}문제 · ${e.passages}지문</div>
-        <div class="card-prog">${answered}/${e.questions} 답함${answered ? ` · 정답 ${correct}` : ''}</div>
+        <div class="progress-track" role="progressbar" aria-label="${escapeHtml(e.title)} 학습 진도" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress}">
+          <span style="width: ${progress}%"></span>
+        </div>
+        <div class="card-foot">
+          <span>${answered}/${e.questions} 완료</span>
+          <span>정답률 ${accuracy}%</span>
+        </div>
       </a>`;
   }).join('');
 
   const resume = last
-    ? `<a class="resume" href="#/exam/${last.examId}/q/${last.questionN}">↪ 마지막 위치로 이어서 (${last.examId} · 문제 ${last.questionN})</a>`
+    ? `<a class="resume" href="#/exam/${last.examId}/q/${last.questionN}">마지막 위치로 이어서 풀기 <span>${last.examId} · 문제 ${last.questionN}</span></a>`
     : '';
 
   root.innerHTML = `
-    <header class="hero">
-      <h1>JLPT N1 모의고사</h1>
-      ${resume}
-    </header>
-    <div class="cards">${cards}</div>`;
+    <div class="app-shell">
+      <header class="hero home-hero">
+        <div>
+          <p class="hero-kicker">JLPT N1 Study Deck</p>
+          <h1>오늘도 한 회차씩, 선명하게.</h1>
+          <p class="hero-copy">회차별 문제와 한국어 해설, 단어 팝오버를 한 화면에서 집중해서 학습하세요.</p>
+        </div>
+        ${resume}
+      </header>
+      <main class="cards">${cards}</main>
+    </div>`;
 }
